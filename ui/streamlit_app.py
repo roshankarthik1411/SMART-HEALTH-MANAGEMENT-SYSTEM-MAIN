@@ -29,27 +29,43 @@ st.markdown("""
         text-align: center;
         margin-bottom: 2rem;
     }
+
     .symptom-box {
-        background-color: #f0f2f6;
+        background-color: #1e293b;
+        color: #ffffff;
         padding: 1rem;
         border-radius: 0.5rem;
         margin: 0.5rem 0;
+        border: 1px solid #334155;
     }
+
     .doctor-card {
-        background-color: #ffffff;
+        background-color: #1e293b;
+        color: #ffffff !important;
         padding: 1.5rem;
         border-radius: 0.5rem;
-        border: 1px solid #e0e0e0;
+        border: 1px solid #334155;
         margin: 1rem 0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
+
+    .doctor-card h4,
+    .doctor-card p,
+    .doctor-card strong,
+    .doctor-card span {
+        color: #ffffff !important;
+    }
+
     .urgency-high {
         color: #ff4b4b;
         font-weight: bold;
     }
+
     .urgency-medium {
         color: #ffa500;
         font-weight: bold;
     }
+
     .urgency-low {
         color: #4caf50;
         font-weight: bold;
