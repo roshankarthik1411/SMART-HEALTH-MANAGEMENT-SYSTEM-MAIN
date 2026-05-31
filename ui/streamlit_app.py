@@ -10,7 +10,7 @@ import plotly.graph_objects as go
 
 
 # Configuration
-API_BASE_URL = "http://localhost:8000/api/v1"
+API_BASE_URL = "https://healthlink-304723691593.asia-south1.run.app/api/v1"
 
 # Page config
 st.set_page_config(
