@@ -11,9 +11,9 @@ on:
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  REGION: us-central1
+  REGION: asia-south1
   SERVICE_NAME: healthlink
-  IMAGE_NAME: gcr.io/${{ secrets.GCP_PROJECT_ID }}/healthlink
+  IMAGE_NAME: asia-south1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/healthlink/healthlink
 
 jobs:
   test:
@@ -27,7 +27,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Cache pip dependencies
         uses: actions/cache@v3
@@ -86,16 +86,16 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
 
-      - name: Configure Docker for GCR
+      - name: Configure Docker for Artifact Registry
         run: |
-          gcloud auth configure-docker
+          gcloud auth configure-docker asia-south1-docker.pkg.dev --quiet
 
       - name: Build Docker image
         run: |
           docker build -t ${{ env.IMAGE_NAME }}:${{ github.sha }} .
           docker tag ${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.IMAGE_NAME }}:latest
 
-      - name: Push Docker image to GCR
+      - name: Push Docker image
         run: |
           docker push ${{ env.IMAGE_NAME }}:${{ github.sha }}
           docker push ${{ env.IMAGE_NAME }}:latest
@@ -112,22 +112,23 @@ jobs:
             --timeout 300 \
             --max-instances 10 \
             --min-instances 0 \
-            --set-env-vars "LOG_LEVEL=INFO" \
-            --set-secrets "GEMINI_API_KEY=GEMINI_API_KEY:latest,PINECONE_API_KEY=PINECONE_API_KEY:latest"
+            --set-env-vars LOG_LEVEL=INFO \
+            --set-secrets GEMINI_API_KEY=GEMINI_API_KEY:latest,PINECONE_API_KEY=PINECONE_API_KEY:latest
 
-      - name: Get service URL
+      - name: Get Service URL
+        id: service-url
         run: |
           SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
             --platform managed \
             --region ${{ env.REGION }} \
-            --format 'value(status.url)')
-          echo "Service deployed to: $SERVICE_URL"
+            --format='value(status.url)')
           echo "SERVICE_URL=$SERVICE_URL" >> $GITHUB_ENV
+          echo "Service URL: $SERVICE_URL"
 
       - name: Run health check
         run: |
           sleep 15
-          curl -f ${{ env.SERVICE_URL }}/api/v1/health || exit 1
+          curl -f $SERVICE_URL/api/v1/health || exit 1
           echo "Health check passed!"
 
   notify:
